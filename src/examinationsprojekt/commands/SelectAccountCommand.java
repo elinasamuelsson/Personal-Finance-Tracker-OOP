@@ -34,7 +34,6 @@ public class SelectAccountCommand implements ICommand {
         for (Account account : accounts) {
             System.out.print((accounts.indexOf(account) + 1) + ":");
             System.out.println("\t" + account.getName() + ", " + account.getType().getTypeDescription());
-            System.out.println("\t" + account.getOwner());
             System.out.println();
         }
 

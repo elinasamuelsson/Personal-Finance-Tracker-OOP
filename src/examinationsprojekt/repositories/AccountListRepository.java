@@ -40,7 +40,7 @@ public class AccountListRepository implements IAccountRepository {
         List<Account> accountsToImport = new ArrayList<>();
 
         //Test account 1: Alice, Checking account
-        Account alice = new CheckingAccount("Private checking account", "Alice", AccountTypes.CHECKING);
+        Account alice = new CheckingAccount("Private checking account", AccountTypes.CHECKING);
 
         alice.addTransactionToList(new Transaction(28000.00, LocalDateTime.of(2022,1,25,14,30).toInstant(ZoneOffset.UTC), TransactionTypes.SALARY, "Monthly salary", true));
         alice.addTransactionToList(new Transaction(-12000.00, LocalDateTime.of(2022,1,1,9,0).toInstant(ZoneOffset.UTC), TransactionTypes.HOUSING, "Monthly rent", false));
@@ -305,7 +305,7 @@ public class AccountListRepository implements IAccountRepository {
         accountsToImport.add(alice);
 
         //Test account 2: Björn, Savings account
-        Account bjorn = new SavingsAccount("Savings account", "Bjorn", AccountTypes.CHECKING, 0.02);
+        Account bjorn = new SavingsAccount("Savings account", AccountTypes.CHECKING, 0.02);
 
         bjorn.addTransactionToList(new Transaction(2000.0, LocalDateTime.of(2022, 1, 5, 9, 45).toInstant(ZoneOffset.UTC), TransactionTypes.SAVINGS, "Monthly transfer to savings", true));
         bjorn.addTransactionToList(new Transaction(10.0, LocalDateTime.of(2022, 3, 31, 10, 0).toInstant(ZoneOffset.UTC), TransactionTypes.INTEREST, "Quarterly interest", true));

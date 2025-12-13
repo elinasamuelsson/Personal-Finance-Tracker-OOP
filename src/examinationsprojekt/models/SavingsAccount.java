@@ -3,8 +3,8 @@ package examinationsprojekt.models;
 public class SavingsAccount extends Account {
     private final double monthlyInterestRate;
 
-    public SavingsAccount(String name, String owner, AccountTypes type, double interestRate) {
-        super(name, owner, type);
+    public SavingsAccount(String name, AccountTypes type, double interestRate) {
+        super(name, type);
         this.monthlyInterestRate = interestRate;
     }
 

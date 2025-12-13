@@ -24,14 +24,13 @@ public class AddAccountCommand implements ICommand {
 
         AccountTypes type = returnAccountType();
         String name = returnAccountName();
-        String owner = returnAccountOwner();
 
         if (type.equals(AccountTypes.CHECKING)) {
-            account = new CheckingAccount(name, owner, type);
+            account = new CheckingAccount(name, type);
         } else if (type.equals(AccountTypes.SAVING)) {
             double interest = returnAccountInterest();
 
-            account = new SavingsAccount(name, owner, type, interest);
+            account = new SavingsAccount(name, type, interest);
         }
 
         List<Account> existingAccounts = repository.findAll();
@@ -71,20 +70,6 @@ public class AddAccountCommand implements ICommand {
                 System.out.println("Option does not exist. Please enter a valid option.");
             }
         }
-    }
-
-    private String returnAccountOwner() {
-        System.out.println("Enter the owner of this account.");
-
-        String userInput = "";
-        while (true) {
-            userInput = input.stringInput();
-
-            if (userInput.isEmpty()) {
-                System.out.println("Account must have an owner.");
-            } else break;
-        }
-        return userInput;
     }
 
     private String returnAccountName() {

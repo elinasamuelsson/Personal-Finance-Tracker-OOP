@@ -5,14 +5,12 @@ import java.util.ArrayList;
 
 public abstract class Account implements Serializable {
     protected final String name;
-    protected final String owner;
     protected final AccountTypes type;
     protected double balance;
     protected final ArrayList<Transaction> transactions;
 
-    Account(String name, String owner, AccountTypes type) {
+    Account(String name, AccountTypes type) {
         this.name = name;
-        this.owner = owner;
         this.type = type;
         this.balance = 0;
         this.transactions = new ArrayList<Transaction>();
@@ -20,10 +18,6 @@ public abstract class Account implements Serializable {
 
     public String getName() {
         return name;
-    }
-
-    public String getOwner() {
-        return owner;
     }
 
     public AccountTypes getType() {
