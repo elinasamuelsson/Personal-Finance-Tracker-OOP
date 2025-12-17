@@ -12,7 +12,16 @@ public class UserListRepository implements IUserRepository {
         users.add(createdUser);
     }
 
-    public List<User> findAll() {
+    public User findSingleUser(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public List<User> findAllUsers() {
         return new ArrayList<>(users);
     }
 

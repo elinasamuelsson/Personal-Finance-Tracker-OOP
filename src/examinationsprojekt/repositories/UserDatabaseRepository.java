@@ -14,7 +14,7 @@ public class UserDatabaseRepository {
         return null;
     };
 
-    List<User> findAll() throws IOException, ClassNotFoundException {
+    List<User> findAllUsers() throws IOException, ClassNotFoundException {
         return null;
     };
 

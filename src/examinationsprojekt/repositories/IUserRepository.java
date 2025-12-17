@@ -10,7 +10,7 @@ public interface IUserRepository {
 
     User findSingleUser(String username) throws IOException, ClassNotFoundException;
 
-    List<User> findAll() throws IOException, ClassNotFoundException;
+    List<User> findAllUsers() throws IOException, ClassNotFoundException;
 
     boolean update(User updatedUser) throws IOException;
 

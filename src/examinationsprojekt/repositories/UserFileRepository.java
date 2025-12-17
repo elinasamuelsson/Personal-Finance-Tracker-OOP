@@ -42,7 +42,7 @@ public class UserFileRepository implements IUserRepository {
         return null;
     }
 
-    public List<User> findAll() throws IOException, ClassNotFoundException {
+    public List<User> findAllUsers() throws IOException, ClassNotFoundException {
         List<User> users = new ArrayList<>();
         File folder = new File("saveData");
 
