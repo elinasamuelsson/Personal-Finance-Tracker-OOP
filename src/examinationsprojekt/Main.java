@@ -27,12 +27,11 @@ public interface TransactionSaver {
 */
 package examinationsprojekt;
 
-import examinationsprojekt.managers.ICommandManager;
-import examinationsprojekt.managers.TerminalCommandManager;
+import examinationsprojekt.managers.TerminalUserManager;
 
 public class Main {
     public static void main(String[] args) {
-        ICommandManager manager = new TerminalCommandManager();
-        manager.run();
+        TerminalUserManager terminalUserManager = new TerminalUserManager();
+        terminalUserManager.run();
     }
 }
