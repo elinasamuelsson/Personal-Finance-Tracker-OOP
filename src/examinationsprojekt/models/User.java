@@ -1,12 +1,13 @@
 package examinationsprojekt.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
-    private String username;
-    private String password;
-    private List<Account> accounts;
+public class User implements Serializable {
+    final private String username;
+    final private String password;
+    final private List<Account> accounts;
 
     public User(String username, String password) {
         this.username = username;
@@ -28,6 +29,14 @@ public class User {
 
     public void addAccountToList(Account account) {
         accounts.add(account);
+    }
+
+    public void updateExistingAccount(Account account) {
+        for (Account a : accounts) {
+            if (a.equals(account)) {
+                a = account;
+            }
+        }
     }
 
     public void removeAccountFromList(Account account) {
