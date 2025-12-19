@@ -1,11 +1,13 @@
 package examinationsprojekt.commands;
 
+import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.List;
 
@@ -19,9 +21,9 @@ public class AddAccountCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        Account account = null;
-        IAccountRepository repository = new AccountFileRepository();
+        IUserRepository repository = new UserFileRepository();
 
+        Account account = null;
         AccountTypes type = returnAccountType();
         String name = returnAccountName();
 
@@ -33,10 +35,18 @@ public class AddAccountCommand implements ICommand {
             account = new SavingsAccount(name, type, interest);
         }
 
-        List<Account> existingAccounts = repository.findAll();
+        User user = null;
+        try {
+            user = repository.findSingleUser(
+                    CurrentStateManager.getCurrentUser().getUsername());
+        } catch (IOException | ClassNotFoundException exception) {
+            System.out.println("User not found.");
+        }
 
-        if (!existingAccounts.isEmpty()) {
-            for (Account existingAccount : existingAccounts) {
+        List<Account> userAccounts = user.getAccounts();
+
+        if (!userAccounts.isEmpty()) {
+            for (Account existingAccount : userAccounts) {
                 if (existingAccount.getName().equals(account.getName())) {
                     System.out.println("Account name already exists in another account.");
                     System.out.println("Restart account creation and try again.");
@@ -45,9 +55,16 @@ public class AddAccountCommand implements ICommand {
             }
         }
 
-        repository.save(account);
-        System.out.println("Account successfully created.");
-        System.out.println("Returning to menu.");
+        user.addAccountToList(account);
+
+        try {
+            repository.update(user);
+            System.out.println("Account successfully created.");
+            System.out.println("Returning to menu.");
+        } catch (IOException exception) {
+            System.out.println("Account creation failed.");
+            System.out.println("Returning to menu.");
+        }
     }
 
 

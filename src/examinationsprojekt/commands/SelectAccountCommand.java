@@ -2,11 +2,13 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SelectAccountCommand implements ICommand {
@@ -19,12 +21,22 @@ public class SelectAccountCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IAccountRepository repository = new AccountFileRepository();
+        IUserRepository repository = new UserFileRepository();
 
         System.out.println("Which of the following accounts do you want to use?");
         System.out.println();
 
-        List<Account> accounts = repository.findAll();
+        User user = null;
+
+        try {
+            user = repository.findSingleUser(
+                    CurrentStateManager.getCurrentUser().getUsername()
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<Account> accounts = user.getAccounts();
 
         if (accounts.isEmpty()) {
             System.out.println("No accounts found.");
