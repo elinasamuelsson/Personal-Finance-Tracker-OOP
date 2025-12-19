@@ -2,9 +2,11 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ViewAccountBalanceCommand implements ICommand {
@@ -15,20 +17,33 @@ public class ViewAccountBalanceCommand implements ICommand {
     }
 
     public void run() {
-        IAccountRepository repository = new AccountFileRepository();
+        IUserRepository repository = new UserFileRepository();
+
+        User user = null;
         Account accountToPrintBalanceFrom = null;
+
+        try {
+            user = repository.findSingleUser(
+                    CurrentStateManager.getCurrentUser().getUsername()
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
 
         if (CurrentStateManager.getCurrentAccount() == null) {
             System.out.println("Select an account before viewing account balance.");
             return;
-        } else {
-            List<Account> accounts = repository.findAll();
-            for (Account account : accounts) {
-                if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                    accountToPrintBalanceFrom = account;
-                }
+        }
+
+        List<Account> accounts = user.getAccounts();
+
+        for (Account a : accounts) {
+            if (a.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
+                accountToPrintBalanceFrom = a;
             }
         }
+
 
         if (accountToPrintBalanceFrom == null) {
             System.out.println("Select an account before viewing account balance.");

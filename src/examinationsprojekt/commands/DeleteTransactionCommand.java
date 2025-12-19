@@ -3,10 +3,13 @@ package examinationsprojekt.commands;
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.Transaction;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
+
+import java.io.IOException;
 
 public class DeleteTransactionCommand implements ICommand {
     private final int index = 6;
@@ -18,14 +21,23 @@ public class DeleteTransactionCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IAccountRepository repository = new AccountFileRepository();
+        IUserRepository repository = new UserFileRepository();
+        User userToDeleteFrom = null;
         Account accountToDeleteFrom = null;
+
+        try {
+            userToDeleteFrom = repository.findSingleUser(
+                    CurrentStateManager.getCurrentUser().getUsername()
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         if (CurrentStateManager.getCurrentAccount() == null) {
             System.out.println("Select an account before deleting transactions.");
             return;
         } else {
-            for (Account account : repository.findAll()) {
+            for (Account account : userToDeleteFrom.getAccounts()) {
                 if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
                     accountToDeleteFrom = account;
                 }
@@ -52,9 +64,14 @@ public class DeleteTransactionCommand implements ICommand {
                 System.out.println("Restart transaction deletion and try again.");
                 return;
             }
-            repository.update(accountToDeleteFrom);
-            System.out.println("Transaction has been deleted.");
-            break;
+
+            try {
+                repository.update(userToDeleteFrom);
+                System.out.println("Transaction has been deleted.");
+                break;
+            } catch (IOException e) {
+                System.out.println("Transaction could not be deleted.");
+            }
         }
     }
 }

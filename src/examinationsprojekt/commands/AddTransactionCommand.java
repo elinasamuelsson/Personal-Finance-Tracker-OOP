@@ -4,17 +4,21 @@ import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Objects;
 
 public class AddTransactionCommand implements ICommand {
     private final int index = 4;
@@ -30,8 +34,25 @@ public class AddTransactionCommand implements ICommand {
             System.out.println("Select an account before adding transactions.");
             return;
         }
-        Account account = CurrentStateManager.getCurrentAccount();
-        IAccountRepository repository = new AccountFileRepository();
+
+        IUserRepository repository = new UserFileRepository();
+        User user;
+
+        try {
+            user = repository.findSingleUser(
+                    CurrentStateManager.getCurrentUser().getUsername()
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        Account account = null;
+
+        for (Account a : user.getAccounts()) {
+            if (a.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
+                account = a;
+            }
+        }
 
         boolean isEarning = returnIsEarning();
         TransactionTypes type = returnType();
@@ -48,14 +69,16 @@ public class AddTransactionCommand implements ICommand {
 
         account.addTransactionToList(transaction);
         account.setBalance(amount);
+        user.updateExistingAccount(account);
 
-        if (!repository.update(account)) {
-            repository.save(account);
-            return;
+        try {
+            repository.update(user);
+            System.out.println("Transaction has been added.");
+        } catch (
+                IOException exception) {
+            System.out.println("Transaction has not been added.");
+            new RuntimeException(exception);
         }
-
-        repository.update(account);
-        System.out.println("Transaction has been added.");
     }
 
     private TransactionTypes returnType() {

@@ -2,15 +2,15 @@ package examinationsprojekt.managers;
 
 import examinationsprojekt.commands.*;
 import examinationsprojekt.models.Account;
+import examinationsprojekt.models.User;
 import examinationsprojekt.models.ViewOptions;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -22,8 +22,6 @@ public class TerminalCommandManager implements ICommandManager {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        System.out.println("Welcome to the revised OOP version of the Personal Finance Tracker!");
-
         while (true) {
             printMainMenuOptions();
 
@@ -32,16 +30,27 @@ public class TerminalCommandManager implements ICommandManager {
 
             if (command != null && !userInput.equals("5")) {
                 command.run();
-            } else if (userInput.equals("5")) { //move validation into viewTransactionsCommand
-                IAccountRepository repository = new AccountFileRepository();
+            } else if (userInput.equals("5")) {
+                IUserRepository repository = new UserFileRepository();
                 Account accountToView = null;
 
                 if (CurrentStateManager.getCurrentAccount() == null) {
-                    System.out.println("Select an account before viewing account balance.");
+                    System.out.println("Select an account before viewing account transactions.");
                     continue;
                 }
 
-                List<Account> accounts = repository.findAll();
+                User user = null;
+
+                try {
+                    user = repository.findSingleUser(
+                            CurrentStateManager.getCurrentUser().getUsername()
+                    );
+                } catch (IOException | ClassNotFoundException e) {
+                    System.out.println("No user logged in.");
+                }
+
+                List<Account> accounts = user.getAccounts();
+
                 for (Account account : accounts) {
                     if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
                         accountToView = account;
@@ -53,9 +62,6 @@ public class TerminalCommandManager implements ICommandManager {
                 } else {
                     viewTransactionsSubMenu();
                 }
-            } else if (userInput.equals("0")) {
-                System.out.println("Exiting program.");
-                System.exit(0);
             } else {
                 System.out.println("Invalid command. Try again.");
             }
@@ -100,7 +106,6 @@ public class TerminalCommandManager implements ICommandManager {
             index++;
         }
 
-        System.out.println("\t0. Exit program");
         System.out.println("-------------------------------------------");
         System.out.println();
     }
@@ -124,7 +129,8 @@ public class TerminalCommandManager implements ICommandManager {
             if (files == null) continue;
 
             for (File file : files) {
-                if (file.getName().endsWith(".class") && !file.getName().contains("ICommand")) {
+                if (file.getName().endsWith(".class") && !file.getName().contains("ICommand")
+                        && !file.getName().contains("Login") && !file.getName().contains("Register")) { //temporary fix to exclude login and register
                     String className = "examinationsprojekt.commands."
                             + file.getName().substring(0, file.getName().length() - 6);
                     commandClasses.add(Class.forName(className));
@@ -177,6 +183,7 @@ public class TerminalCommandManager implements ICommandManager {
         }
         List<Class<?>> commandClasses;
         ICommand command = null;
+
         try {
             commandClasses = findAllCommandClasses();
         } catch (ClassNotFoundException | IOException exception) {

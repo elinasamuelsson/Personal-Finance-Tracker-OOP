@@ -1,15 +1,13 @@
 package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
-import examinationsprojekt.models.Account;
-import examinationsprojekt.models.Transaction;
-import examinationsprojekt.models.TransactionTypes;
-import examinationsprojekt.models.ViewOptions;
-import examinationsprojekt.repositories.AccountFileRepository;
-import examinationsprojekt.repositories.IAccountRepository;
+import examinationsprojekt.models.*;
+import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -36,17 +34,25 @@ public class ViewTransactionsCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IAccountRepository repository = new AccountFileRepository();
+        IUserRepository repository = new UserFileRepository();
+
+        User userToView = null;
         Account accountToView = null;
 
-        List<Account> accounts = repository.findAll();
+        try {
+            userToView = repository.findSingleUser(CurrentStateManager.getCurrentUser().getUsername());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<Account> accounts = userToView.getAccounts();
         for (Account account : accounts) {
             if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
                 accountToView = account;
             }
         }
 
-        List<Transaction> transactions = sortAllTransactions(accountToView); //cannot be null, validation happens outside ViewTransactionCommand for now
+        List<Transaction> transactions = sortAllTransactions(accountToView);
 
         if (option.equals(ViewOptions.YEARLY)) {
             viewYearly(transactions);
