@@ -1,7 +1,8 @@
 ### IntelliJ IDEA ###
 out/
+
 .idea/
-Personal Finance Tracker OOP.iml
+Personal-Finance-Tracker-OOP.iml
 
 ### Eclipse ###
 .apt_generated
@@ -25,6 +26,9 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Maven ###
+target/
 
 ### General ###
 saveData/

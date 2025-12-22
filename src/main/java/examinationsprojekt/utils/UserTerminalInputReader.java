@@ -36,3 +36,5 @@ public class UserTerminalInputReader implements IUserInputReader {
         }
     }
 }
+
+// TODO: if there is time move error handling out of this file
