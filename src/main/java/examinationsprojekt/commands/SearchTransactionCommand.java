@@ -53,7 +53,7 @@ public class SearchTransactionCommand implements ICommand {
             userInput = input.stringInput().toLowerCase();
 
             for (Transaction transaction : accountToSearchFrom.getTransactionsCopy()) {
-                if (transaction.getId().toLowerCase().contains(userInput) ||
+                if (transaction.getId().toString().toLowerCase().contains(userInput) ||
                 transaction.getDescription().toLowerCase().contains(userInput) ||
                 transaction.getType().toString().toLowerCase().contains(userInput) ||
                 transaction.getLocalTime().toString().toLowerCase().contains(userInput)) {
