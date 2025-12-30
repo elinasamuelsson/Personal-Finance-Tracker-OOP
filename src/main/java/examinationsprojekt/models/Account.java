@@ -2,14 +2,17 @@ package examinationsprojekt.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public abstract class Account implements Serializable {
+    protected UUID id;
     protected final String name;
     protected final AccountTypes type;
     protected double balance;
     protected final ArrayList<Transaction> transactions;
 
     Account(String name, AccountTypes type) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.type = type;
         this.balance = 0;

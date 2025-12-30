@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 public class Transaction implements Serializable {
-    private final String id;
+    private final UUID id;
     private final double amount;
     private final Instant time;
     private final TransactionTypes type;
@@ -15,14 +16,14 @@ public class Transaction implements Serializable {
 
     public Transaction(double amount, Instant time, TransactionTypes type, String description, boolean isEarning) {
         this.isEarning = isEarning;
-        this.id = idGenerator();
+        this.id = UUID.randomUUID();
         this.amount = amount;
         this.time = time;
         this.type = type;
         this.description = description;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -44,16 +45,5 @@ public class Transaction implements Serializable {
 
     public boolean isEarning() {
         return isEarning;
-    }
-
-    private String idGenerator() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder id = new StringBuilder();
-
-        for (int i = 0; i < 8; i++) {
-            id.append(chars.charAt((int) (Math.random() * chars.length())));
-        }
-
-        return id.toString();
     }
 }

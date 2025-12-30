@@ -1,15 +1,22 @@
 package examinationsprojekt.models;
 
+import examinationsprojekt.repositories.IUserRepository;
+import examinationsprojekt.repositories.UserFileRepository;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class User implements Serializable {
+    final private UUID id;
     final private String username;
     final private String password;
     final private List<Account> accounts;
 
     public User(String username, String password) {
+        this.id = UUID.randomUUID();
         this.username = username;
         this.password = password;
         this.accounts = new ArrayList<>();
