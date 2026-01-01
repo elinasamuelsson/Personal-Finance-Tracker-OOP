@@ -2,6 +2,8 @@ package examinationsprojekt.managers;
 
 import examinationsprojekt.commands.LoginUserCommand;
 import examinationsprojekt.commands.RegisterUserCommand;
+import examinationsprojekt.repositories.IUserRepository;
+import examinationsprojekt.repositories.UserDatabaseRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 

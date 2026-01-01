@@ -23,6 +23,10 @@ public class TerminalCommandManager implements ICommandManager {
 
     public void run() {
         while (true) {
+            System.out.print("Welcome ");
+            System.out.print(CurrentStateManager.getCurrentUser().getUsername());
+            System.out.println("!");
+
             printMainMenuOptions();
 
             String userInput = input.stringInput();

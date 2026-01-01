@@ -5,18 +5,26 @@ import examinationsprojekt.managers.ICommandManager;
 import examinationsprojekt.managers.TerminalCommandManager;
 import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.IUserRepository;
-import examinationsprojekt.repositories.UserFileRepository;
+import examinationsprojekt.repositories.UserDatabaseRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
-
-import java.io.IOException;
-import java.util.Objects;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginUserCommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        IUserRepository repository;
+
+
+        try {
+            repository = new UserDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS"));
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
 
         System.out.println("Enter your username and password: ");
 
@@ -30,21 +38,26 @@ public class LoginUserCommand {
             System.out.print("Password: ");
             passwordInput = input.stringInput();
 
-            //hash password input and compare hashed input to hashed stored password
-
             try {
                 user = repository.findSingleUser(usernameInput);
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Invalid username or password.");
+            } catch (Exception e) {
+                System.out.println("No such user or password.");
             }
 
-            if (user == null || !Objects.equals(passwordInput, user.getPassword())) {
-                System.out.println("Invalid username or password.");
-            } else if (passwordInput.equals(user.getPassword())) {
-                System.out.println("Login successful.");
-                CurrentStateManager.setCurrentUser(user);
-                break;
+            if (user == null) {
+                System.out.println("No such user or password.");
+                continue;
             }
+
+            if (!BCrypt.checkpw(passwordInput, user.getPasswordHash())) {
+                System.out.println("No such user or password.");
+                continue;
+            }
+
+            System.out.println("Login successful.");
+            System.out.println();
+            CurrentStateManager.setCurrentUser(user);
+            break;
         }
 
         ICommandManager commandManager = new TerminalCommandManager();

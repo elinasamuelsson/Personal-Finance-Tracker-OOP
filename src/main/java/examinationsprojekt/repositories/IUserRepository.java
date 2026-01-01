@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IUserRepository {
-    void save(User createdUser) throws IOException;
+    void save(User createdUser) throws Exception;
 
-    User findSingleUser(String username) throws IOException, ClassNotFoundException;
+    User findSingleUser(String username) throws Exception;
 
-    List<User> findAllUsers() throws IOException, ClassNotFoundException;
+    List<User> findAllUsers() throws Exception;
 
-    boolean update(User updatedUser) throws IOException;
+    boolean update(User updatedUser) throws Exception;
 
-    void delete(User deletedUser) throws IOException;
+    void delete(User deletedUser) throws Exception;
 }

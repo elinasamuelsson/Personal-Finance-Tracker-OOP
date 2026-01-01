@@ -2,11 +2,14 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.IUserRepository;
+import examinationsprojekt.repositories.UserDatabaseRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +17,23 @@ public class RegisterUserCommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        IUserRepository repository;
+
+        try {
+            repository = new UserDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         List<User> users;
         List<String> existingUsernames = new ArrayList<>();
 
         try {
             users = repository.findAllUsers();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -36,7 +48,7 @@ public class RegisterUserCommand {
             username = returnTextString();
 
             if (existingUsernames.contains(username)) {
-                System.out.println("Username is already in use.");
+                System.out.println("Invalid username, try another one.");
             } else break;
         }
 
@@ -50,14 +62,15 @@ public class RegisterUserCommand {
             } else break;
         }
 
-        User user = new User(username, password);
+        String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt(12));
+
+        User user = new User(username, passwordHash);
 
         try {
             repository.save(user);
             System.out.println("User profile successfully created.");
-        } catch (IOException e) {
-            System.out.println("User creation failed.");
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("User creation failed.");
         }
         System.out.println("Returning to menu.");
     }
