@@ -4,6 +4,8 @@ import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.ITransactionRepository;
+import examinationsprojekt.repositories.TransactionDatabaseRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
@@ -22,44 +24,35 @@ public class SearchTransactionCommand implements ICommand {
     IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
-        User userToSearchFrom = null;
-        Account accountToSearchFrom = null;
+        ITransactionRepository repository;
 
         try {
-            userToSearchFrom = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername()
+            repository = new TransactionDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
             );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
         }
 
         if (CurrentStateManager.getCurrentAccount() == null) {
             System.out.println("Select an account before searching transactions.");
             return;
-        } else {
-            List<Account> accounts = userToSearchFrom.getAccounts();
-            for (Account account : accounts) {
-                if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                    accountToSearchFrom = account;
-                }
-            }
         }
 
-        List<Transaction> searchResults = new ArrayList<>();
+        List<Transaction> searchResults;
         String userInput = "";
         while (true) {
             System.out.println("Enter the phrase you wish to search for.");
             userInput = input.stringInput().toLowerCase();
 
-            for (Transaction transaction : accountToSearchFrom.getTransactionsCopy()) {
-                if (transaction.getId().toString().toLowerCase().contains(userInput) ||
-                transaction.getDescription().toLowerCase().contains(userInput) ||
-                transaction.getType().toString().toLowerCase().contains(userInput) ||
-                transaction.getLocalTime().toString().toLowerCase().contains(userInput)) {
-                    searchResults.add(transaction);
-                }
+            try {
+                searchResults = repository.searchTransactions(userInput);
+            } catch (Exception e) {
+                throw new RuntimeException("Could not connect to database.", e);
             }
+
             printSearchResults(searchResults);
             searchResults.clear();
             return;

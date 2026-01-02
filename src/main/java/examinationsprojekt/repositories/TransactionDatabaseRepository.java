@@ -77,6 +77,36 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         return transactions;
     }
 
+    public List<Transaction> searchTransactions(String searchPhrase) throws Exception {
+        List<Transaction> searchResults = new ArrayList<>();
+
+        String sql = "SELECT * FROM transactions " +
+                "WHERE id::text ILIKE ? OR description ILIKE ? OR transaction_type ILIKE ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            String searchpattern = "%" + searchPhrase + "%";
+
+            statement.setString(1, searchpattern);
+            statement.setString(2, searchpattern);
+            statement.setString(3, searchpattern);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Transaction transaction = new Transaction(
+                        resultSet.getObject("id", UUID.class),
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("time").toInstant(),
+                        TransactionTypes.valueOf(resultSet.getString("transaction_type")),
+                        resultSet.getString("description"),
+                        resultSet.getBoolean("isEarning")
+                );
+                searchResults.add(transaction);
+            }
+        }
+        return searchResults;
+    }
+
     public boolean delete(UUID id) throws Exception {
         String sql = "DELETE FROM transactions WHERE id = ?";
 
