@@ -3,6 +3,8 @@ package examinationsprojekt.commands;
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.AccountDatabaseRepository;
+import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
@@ -21,39 +23,45 @@ public class DeleteAccountCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        IAccountRepository repository;
+
+        try {
+            repository = new AccountDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
 
         System.out.println("Which of the following accounts do you want to delete?");
         System.out.println();
 
-        User user = null;
         Account accountToRemove = null;
+        List<Account> userAccounts;
 
         try {
-            user = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername()
-            );
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("No such user.");
+            userAccounts = repository.findAllUserAccounts();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not find accounts in the database.", e);
         }
 
-        List<Account> allUserAccounts = user.getAccounts();
-
-        if (allUserAccounts.isEmpty()) {
+        if (userAccounts.isEmpty()) {
             System.out.println("No accounts found.");
             return;
         }
 
-        for (Account account : allUserAccounts) {
-            System.out.print((allUserAccounts.indexOf(account) + 1) + ":");
+        for (Account account : userAccounts) {
+            System.out.print((userAccounts.indexOf(account) + 1) + ":");
             System.out.println("\t" + account.getName() + ", " + account.getType().getTypeDescription());
             System.out.println();
         }
 
         int userInput = input.intInput();
 
-        for (Account account : allUserAccounts) {
-            if (userInput == (allUserAccounts.indexOf(account) + 1)) {
+        for (Account account : userAccounts) {
+            if (userInput == (userAccounts.indexOf(account) + 1)) {
                 if (CurrentStateManager.getCurrentAccount() != null) {
                     if (CurrentStateManager.getCurrentAccount().getName().equals(account.getName())) {
                         CurrentStateManager.setCurrentAccount(null);
@@ -64,12 +72,11 @@ public class DeleteAccountCommand implements ICommand {
                 accountToRemove = account;
             }
         }
-        user.removeAccountFromList(accountToRemove);
 
         try {
-            repository.update(user);
+            repository.delete(accountToRemove);
             System.out.println(accountToRemove.getName() + " deleted.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(accountToRemove.getName() + " could not be deleted.");
         }
     }

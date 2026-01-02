@@ -3,6 +3,8 @@ package examinationsprojekt.commands;
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.AccountDatabaseRepository;
+import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
@@ -21,22 +23,27 @@ public class SelectAccountCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        IAccountRepository repository;
+        try {
+            repository = new AccountDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
 
         System.out.println("Which of the following accounts do you want to use?");
         System.out.println();
 
-        User user = null;
+        List<Account> accounts;
 
         try {
-            user = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername()
-            );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        accounts = repository.findAllUserAccounts();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not find accounts in the database.", e);
         }
-
-        List<Account> accounts = user.getAccounts();
 
         if (accounts.isEmpty()) {
             System.out.println("No accounts found.");
