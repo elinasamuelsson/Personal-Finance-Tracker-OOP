@@ -112,6 +112,17 @@ public class AccountDatabaseRepository implements IAccountRepository {
         return accounts;
     }
 
+    public boolean updateAccountBalance(UUID id, double amount) throws Exception {
+        String sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDouble(1, amount);
+            statement.setObject(2, id);
+
+            return statement.executeUpdate() == 1;
+        }
+    }
+
     public boolean delete(Account account) throws SQLException {
         String sql = "DELETE FROM accounts WHERE id = ?";
 

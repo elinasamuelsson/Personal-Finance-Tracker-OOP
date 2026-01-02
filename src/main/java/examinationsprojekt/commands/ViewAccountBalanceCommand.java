@@ -3,6 +3,8 @@ package examinationsprojekt.commands;
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
 import examinationsprojekt.models.User;
+import examinationsprojekt.repositories.AccountDatabaseRepository;
+import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.repositories.IUserRepository;
 
@@ -17,39 +19,33 @@ public class ViewAccountBalanceCommand implements ICommand {
     }
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
-
-        User user = null;
-        Account accountToPrintBalanceFrom = null;
+        IAccountRepository repository;
 
         try {
-            user = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername()
+            repository = new AccountDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
             );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database,", e);
         }
-
 
         if (CurrentStateManager.getCurrentAccount() == null) {
             System.out.println("Select an account before viewing account balance.");
             return;
         }
 
-        List<Account> accounts = user.getAccounts();
+        Account account;
 
-        for (Account a : accounts) {
-            if (a.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                accountToPrintBalanceFrom = a;
-            }
+        try {
+            account = repository.findSingleAccount(
+                    CurrentStateManager.getCurrentAccount().getName()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
         }
 
-
-        if (accountToPrintBalanceFrom == null) {
-            System.out.println("Select an account before viewing account balance.");
-            return;
-        }
-
-        System.out.println("Your current account balance is " + accountToPrintBalanceFrom.getBalance());
+        System.out.println("Your current account balance is " + account.getBalance());
     }
 }
