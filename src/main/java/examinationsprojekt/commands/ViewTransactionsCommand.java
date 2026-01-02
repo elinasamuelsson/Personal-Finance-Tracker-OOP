@@ -2,6 +2,8 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
+import examinationsprojekt.repositories.ITransactionRepository;
+import examinationsprojekt.repositories.TransactionDatabaseRepository;
 import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
@@ -34,25 +36,23 @@ public class ViewTransactionsCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        ITransactionRepository repository;
+        try {
+            repository = new TransactionDatabaseRepository(
+                System.getenv("DB_URL"),
+                System.getenv("DB_USER"),
+                System.getenv("DB_PASS"));
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
 
-        User userToView = null;
-        Account accountToView = null;
+        List<Transaction> transactions;
 
         try {
-            userToView = repository.findSingleUser(CurrentStateManager.getCurrentUser().getUsername());
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            transactions = repository.findAllAccountTransactions();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
         }
-
-        List<Account> accounts = userToView.getAccounts();
-        for (Account account : accounts) {
-            if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                accountToView = account;
-            }
-        }
-
-        List<Transaction> transactions = sortAllTransactions(accountToView);
 
         if (option.equals(ViewOptions.YEARLY)) {
             viewYearly(transactions);

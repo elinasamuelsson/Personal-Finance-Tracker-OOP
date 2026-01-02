@@ -23,12 +23,25 @@ public class Transaction implements Serializable {
         this.description = description;
     }
 
+    public Transaction(UUID id, double amount, Instant time, TransactionTypes type, String description, boolean isEarning) {
+        this.id = id;
+        this.amount = amount;
+        this.time = time;
+        this.type = type;
+        this.description = description;
+        this.isEarning = isEarning;
+    }
+
     public UUID getId() {
         return id;
     }
 
     public double getAmount() {
         return amount;
+    }
+
+    public Instant getUTCTime() {
+        return time;
     }
 
     public LocalDateTime getLocalTime() {

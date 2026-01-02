@@ -23,10 +23,6 @@ public class TerminalCommandManager implements ICommandManager {
 
     public void run() {
         while (true) {
-            System.out.print("Welcome ");
-            System.out.print(CurrentStateManager.getCurrentUser().getUsername());
-            System.out.println("!");
-
             printMainMenuOptions();
 
             String userInput = input.stringInput();
@@ -42,24 +38,7 @@ public class TerminalCommandManager implements ICommandManager {
                     System.out.println("Select an account before viewing account transactions.");
                     continue;
                 }
-
-                User user = null;
-
-                try {
-                    user = repository.findSingleUser(
-                            CurrentStateManager.getCurrentUser().getUsername()
-                    );
-                } catch (IOException | ClassNotFoundException e) {
-                    System.out.println("No user logged in.");
-                }
-
-                List<Account> accounts = user.getAccounts();
-
-                for (Account account : accounts) {
-                    if (account.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                        accountToView = account;
-                    }
-                }
+                accountToView = CurrentStateManager.getCurrentAccount();
 
                 if (accountToView == null) {
                     System.out.println("Select an account before viewing transactions.");

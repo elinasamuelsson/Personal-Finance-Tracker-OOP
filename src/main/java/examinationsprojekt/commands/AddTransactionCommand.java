@@ -5,12 +5,12 @@ import examinationsprojekt.models.Account;
 import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
 import examinationsprojekt.models.User;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
+import examinationsprojekt.repositories.*;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -19,6 +19,7 @@ import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class AddTransactionCommand implements ICommand {
     private final int index = 4;
@@ -35,23 +36,23 @@ public class AddTransactionCommand implements ICommand {
             return;
         }
 
-        IUserRepository repository = new UserFileRepository();
-        User user;
+        IAccountRepository accountRepository;
+        ITransactionRepository transactionRepository;
 
         try {
-            user = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername()
+            accountRepository = new AccountDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
             );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
 
-        Account account = null;
-
-        for (Account a : user.getAccounts()) {
-            if (a.getName().equals(CurrentStateManager.getCurrentAccount().getName())) {
-                account = a;
-            }
+            transactionRepository = new TransactionDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
         }
 
         boolean isEarning = returnIsEarning();
@@ -67,17 +68,19 @@ public class AddTransactionCommand implements ICommand {
 
         Transaction transaction = new Transaction(amount, time, type, description, isEarning);
 
-        account.addTransactionToList(transaction);
-        account.setBalance(amount);
-        user.updateExistingAccount(account);
+        try {
+            transactionRepository.save(transaction);
+            System.out.println("Transaction has been saved successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         try {
-            repository.update(user);
-            System.out.println("Transaction has been added.");
-        } catch (
-                IOException exception) {
-            System.out.println("Transaction has not been added.");
-            new RuntimeException(exception);
+            UUID accountId = CurrentStateManager.getCurrentAccount().getId();
+            accountRepository.updateAccountBalance(accountId, amount);
+            System.out.println("Account balance has been updated successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not update account balance.", e);
         }
     }
 
