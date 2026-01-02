@@ -4,10 +4,13 @@ import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.managers.TerminalUserManager;
 
 public class LogoutUserCommand implements ICommand {
-    private final int index = 9;
+    private final int index = 10;
     private final String description = "Logout user";
 
     TerminalUserManager userManager = new TerminalUserManager();
+
+    public LogoutUserCommand() {}
+
     public void run() {
         CurrentStateManager.setCurrentUser(null);
         CurrentStateManager.setCurrentAccount(null);
