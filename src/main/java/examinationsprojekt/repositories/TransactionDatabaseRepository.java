@@ -77,7 +77,13 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         return transactions;
     }
 
-    public boolean delete(Transaction deletedTransaction) throws Exception {
-        return false;
+    public boolean delete(UUID id) throws Exception {
+        String sql = "DELETE FROM transactions WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setObject(1, id);
+
+            return statement.executeUpdate() == 1;
+        }
     }
 }

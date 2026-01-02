@@ -14,5 +14,5 @@ public interface ITransactionRepository {
 
     List<Transaction> findAllAccountTransactions() throws Exception;
 
-    boolean delete(Transaction deletedTransaction) throws Exception;
+    boolean delete(UUID id) throws Exception;
 }
