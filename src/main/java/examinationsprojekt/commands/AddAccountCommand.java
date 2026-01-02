@@ -1,13 +1,11 @@
 package examinationsprojekt.commands;
 
-import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
+import examinationsprojekt.repositories.AccountDatabaseRepository;
+import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
-import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.List;
 
@@ -21,9 +19,19 @@ public class AddAccountCommand implements ICommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
     public void run() {
-        IUserRepository repository = new UserFileRepository();
+        IAccountRepository repository;
+                try {
+                repository = new AccountDatabaseRepository(
+                System.getenv("DB_URL"),
+                System.getenv("DB_USER"),
+                System.getenv("DB_PASS")
+        );
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not connect to database.", e);
+                }
 
         Account account = null;
+
         AccountTypes type = returnAccountType();
         String name = returnAccountName();
 
@@ -35,15 +43,12 @@ public class AddAccountCommand implements ICommand {
             account = new SavingsAccount(name, type, interest);
         }
 
-        User user = null;
-        try {
-            user = repository.findSingleUser(
-                    CurrentStateManager.getCurrentUser().getUsername());
-        } catch (IOException | ClassNotFoundException exception) {
-            System.out.println("User not found.");
-        }
-
-        List<Account> userAccounts = user.getAccounts();
+        List<Account> userAccounts;
+                try {
+                    userAccounts = repository.findAllUserAccounts();
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not connect to database.", e);
+                }
 
         if (!userAccounts.isEmpty()) {
             for (Account existingAccount : userAccounts) {
@@ -55,15 +60,12 @@ public class AddAccountCommand implements ICommand {
             }
         }
 
-        user.addAccountToList(account);
-
         try {
-            repository.update(user);
+            repository.save(account);
             System.out.println("Account successfully created.");
             System.out.println("Returning to menu.");
-        } catch (IOException exception) {
-            System.out.println("Account creation failed.");
-            System.out.println("Returning to menu.");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not save account.\nReturning to menu.", e);
         }
     }
 

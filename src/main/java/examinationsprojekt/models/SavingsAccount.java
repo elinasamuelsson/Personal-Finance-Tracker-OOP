@@ -1,5 +1,7 @@
 package examinationsprojekt.models;
 
+import java.util.UUID;
+
 public class SavingsAccount extends Account {
     private final double monthlyInterestRate;
 
@@ -8,6 +10,12 @@ public class SavingsAccount extends Account {
         this.monthlyInterestRate = interestRate;
     }
 
+    public SavingsAccount(UUID id, String name, AccountTypes type, double balance, double monthlyInterestRate) {
+        super(id,  name, type, balance);
+        this.monthlyInterestRate = monthlyInterestRate;
+    }
+
+    @Override
     public double getMonthlyInterestRate() {
         return monthlyInterestRate;
     }
