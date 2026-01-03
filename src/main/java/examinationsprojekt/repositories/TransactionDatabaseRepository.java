@@ -5,8 +5,8 @@ import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
 
 import java.sql.*;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +31,7 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
     }
 
     public void save(Transaction createdTransaction) throws SQLException {
-        String sql =  "INSERT INTO transactions (id, account_id, amount, time, transaction_type, description, isearning) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (id, account_id, amount, time, transaction_type, description, isearning) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, createdTransaction.getId());
@@ -106,6 +106,32 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         }
         return searchResults;
     }
+
+    public HashMap<String, Transaction> findLatestTransactionForEachUserAccount(UUID userId) throws Exception {
+        HashMap<String, Transaction> transactions = new HashMap<>();
+        String sql = "SELECT a.account_name, t.id, t.amount, t.time, t.transaction_type, t.description, t.isearning " +
+                "FROM accounts a INNER JOIN transactions t ON a.id=t.account_id AND t.time = (SELECT MAX(transactions.time) " +
+                "FROM transactions WHERE transactions.account_id=a.id)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Transaction transaction = new Transaction(
+                        resultSet.getObject("id", UUID.class),
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("time").toInstant(),
+                        TransactionTypes.valueOf(resultSet.getString("transaction_type")),
+                        resultSet.getString("description"),
+                        resultSet.getBoolean("isEarning")
+                );
+                transactions.put(resultSet.getString("account_name"), transaction);
+            }
+        }
+
+        return transactions;
+    }
+
 
     public boolean delete(UUID id) throws Exception {
         String sql = "DELETE FROM transactions WHERE id = ?";
