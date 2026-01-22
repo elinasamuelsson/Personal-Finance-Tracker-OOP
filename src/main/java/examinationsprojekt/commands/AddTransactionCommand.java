@@ -64,15 +64,14 @@ public class AddTransactionCommand implements ICommand {
         Transaction transaction = new Transaction(amount, time, type, description, isEarning);
 
         try {
-            transactionRepository.save(transaction);
+            transactionRepository.save(transaction, CurrentStateManager.getCurrentAccount().getId());
             System.out.println("Transaction has been saved successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         try {
-            UUID accountId = CurrentStateManager.getCurrentAccount().getId();
-            accountRepository.updateAccountBalance(accountId, amount);
+            accountRepository.updateAccountBalance(CurrentStateManager.getCurrentAccount().getId(), amount);
             System.out.println("Account balance has been updated successfully.");
         } catch (Exception e) {
             throw new RuntimeException("Could not update account balance.", e);

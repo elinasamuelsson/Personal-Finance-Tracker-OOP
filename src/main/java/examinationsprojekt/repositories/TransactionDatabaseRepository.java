@@ -1,6 +1,5 @@
 package examinationsprojekt.repositories;
 
-import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
 
@@ -30,12 +29,12 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         }
     }
 
-    public void save(Transaction createdTransaction) throws SQLException {
+    public void save(Transaction createdTransaction, UUID accountId) throws SQLException {
         String sql = "INSERT INTO transactions (id, account_id, amount, time, transaction_type, description, isearning) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, createdTransaction.getId());
-            statement.setObject(2, CurrentStateManager.getCurrentAccount().getId());
+            statement.setObject(2, accountId);
             statement.setDouble(3, createdTransaction.getAmount());
             statement.setTimestamp(4, Timestamp.from(createdTransaction.getUTCTime()));
             statement.setString(5, createdTransaction.getType().toString());
@@ -52,13 +51,13 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         return null;
     }
 
-    public List<Transaction> findAllAccountTransactions() throws Exception {
+    public List<Transaction> findAllAccountTransactions(UUID accountId) throws Exception {
         List<Transaction> transactions = new ArrayList<>();
 
         String sql = "SELECT * FROM transactions WHERE account_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setObject(1, CurrentStateManager.getCurrentAccount().getId());
+            statement.setObject(1, accountId);
 
             ResultSet resultSet = statement.executeQuery();
 

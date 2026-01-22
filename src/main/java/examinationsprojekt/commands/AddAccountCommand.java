@@ -1,5 +1,6 @@
 package examinationsprojekt.commands;
 
+import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
 import examinationsprojekt.repositories.AccountDatabaseRepository;
 import examinationsprojekt.repositories.IAccountRepository;
@@ -61,7 +62,7 @@ public class AddAccountCommand implements ICommand {
         }
 
         try {
-            repository.save(account);
+            repository.save(account, CurrentStateManager.getCurrentUser().getId());
             System.out.println("Account successfully created.");
             System.out.println("Returning to menu.");
         } catch (Exception e) {

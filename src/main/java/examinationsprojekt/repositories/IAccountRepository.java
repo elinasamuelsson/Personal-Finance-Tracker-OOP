@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IAccountRepository {
-    void save(Account createdAccount) throws Exception;
+    void save(Account createdAccount, UUID userId) throws Exception;
 
     Account findSingleAccount(String accountName) throws Exception;
 

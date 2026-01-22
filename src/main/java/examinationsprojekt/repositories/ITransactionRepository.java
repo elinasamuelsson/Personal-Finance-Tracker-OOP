@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ITransactionRepository {
-    void save(Transaction createdTransaction) throws SQLException;
+    void save(Transaction createdTransaction, UUID accountId) throws SQLException;
 
     Transaction findSingleTransaction(UUID transactionId) throws Exception;
 
-    List<Transaction> findAllAccountTransactions() throws Exception;
+    List<Transaction> findAllAccountTransactions(UUID transactionId) throws Exception;
 
     List<Transaction> searchTransactions(String searchPhrase) throws Exception;
 

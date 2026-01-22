@@ -1,5 +1,6 @@
 package examinationsprojekt.commands;
 
+import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
 import examinationsprojekt.repositories.ITransactionRepository;
 import examinationsprojekt.repositories.TransactionDatabaseRepository;
@@ -45,7 +46,7 @@ public class ViewTransactionsCommand implements ICommand {
         List<Transaction> transactions;
 
         try {
-            transactions = repository.findAllAccountTransactions();
+            transactions = repository.findAllAccountTransactions(CurrentStateManager.getCurrentAccount().getId());
         } catch (Exception e) {
             throw new RuntimeException("Could not connect to database.", e);
         }

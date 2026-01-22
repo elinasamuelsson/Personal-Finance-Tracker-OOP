@@ -1,6 +1,5 @@
 package examinationsprojekt.repositories;
 
-import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.*;
 
 import java.sql.*;
@@ -25,12 +24,12 @@ public class AccountDatabaseRepository implements IAccountRepository {
         }
     }
 
-    public void save(Account account) throws Exception {
+    public void save(Account account, UUID userId) throws Exception {
         String sql = "INSERT INTO accounts (id, user_id, account_name, account_type, balance, interest_rate) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, account.getId());
-            statement.setObject(2, CurrentStateManager.getCurrentUser().getId());
+            statement.setObject(2, userId);
             statement.setString(3, account.getName());
             statement.setString(4, account.getType().toString());
             statement.setDouble(5, account.getBalance());
