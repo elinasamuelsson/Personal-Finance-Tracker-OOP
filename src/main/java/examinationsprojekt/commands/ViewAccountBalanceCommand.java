@@ -2,14 +2,8 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
-import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.AccountDatabaseRepository;
 import examinationsprojekt.repositories.IAccountRepository;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
-
-import java.io.IOException;
-import java.util.List;
 
 public class ViewAccountBalanceCommand implements ICommand {
     private final int index = 8;

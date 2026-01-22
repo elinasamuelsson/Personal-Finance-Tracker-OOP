@@ -1,15 +1,12 @@
 package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
-import examinationsprojekt.models.Account;
 import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
-import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.*;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,8 +14,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class AddTransactionCommand implements ICommand {

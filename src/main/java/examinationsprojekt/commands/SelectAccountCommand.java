@@ -2,15 +2,11 @@ package examinationsprojekt.commands;
 
 import examinationsprojekt.managers.CurrentStateManager;
 import examinationsprojekt.models.Account;
-import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.AccountDatabaseRepository;
 import examinationsprojekt.repositories.IAccountRepository;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SelectAccountCommand implements ICommand {

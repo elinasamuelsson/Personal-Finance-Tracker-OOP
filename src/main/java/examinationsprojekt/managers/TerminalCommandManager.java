@@ -2,10 +2,7 @@ package examinationsprojekt.managers;
 
 import examinationsprojekt.commands.*;
 import examinationsprojekt.models.Account;
-import examinationsprojekt.models.User;
 import examinationsprojekt.models.ViewOptions;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
@@ -31,7 +28,6 @@ public class TerminalCommandManager implements ICommandManager {
             if (command != null && !userInput.equals("5")) {
                 command.run();
             } else if (userInput.equals("5")) {
-                IUserRepository repository = new UserFileRepository();
                 Account accountToView = null;
 
                 if (CurrentStateManager.getCurrentAccount() == null) {

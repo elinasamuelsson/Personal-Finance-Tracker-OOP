@@ -3,13 +3,10 @@ package examinationsprojekt.commands;
 import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.repositories.UserDatabaseRepository;
-import examinationsprojekt.repositories.UserFileRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 

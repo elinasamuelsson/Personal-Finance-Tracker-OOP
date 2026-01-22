@@ -1,13 +1,7 @@
 package examinationsprojekt.commands;
 
-import examinationsprojekt.managers.CurrentStateManager;
-import examinationsprojekt.models.Account;
-import examinationsprojekt.models.Transaction;
-import examinationsprojekt.models.User;
 import examinationsprojekt.repositories.ITransactionRepository;
 import examinationsprojekt.repositories.TransactionDatabaseRepository;
-import examinationsprojekt.repositories.UserFileRepository;
-import examinationsprojekt.repositories.IUserRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 

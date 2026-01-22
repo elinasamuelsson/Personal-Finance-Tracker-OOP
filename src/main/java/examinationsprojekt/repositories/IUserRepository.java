@@ -2,7 +2,6 @@ package examinationsprojekt.repositories;
 
 import examinationsprojekt.models.User;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface IUserRepository {
