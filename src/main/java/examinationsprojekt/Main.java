@@ -7,4 +7,6 @@ public class Main {
         TerminalUserManager terminalUserManager = new TerminalUserManager();
         terminalUserManager.run();
     }
+
+    //TODO: TransactionDatabaseRepository, AccountDatabaseRepository needs Optional returns
 }

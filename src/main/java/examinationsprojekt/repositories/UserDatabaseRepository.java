@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UserDatabaseRepository implements IUserRepository {
-    // TODO: switch to returning Optional<User> where applicable if there is time
     private Connection connection;
 
     public UserDatabaseRepository(String url, String user, String password) throws Exception {
