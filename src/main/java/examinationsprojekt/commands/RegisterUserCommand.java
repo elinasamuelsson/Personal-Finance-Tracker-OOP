@@ -8,7 +8,9 @@ import examinationsprojekt.utils.UserTerminalInputReader;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class RegisterUserCommand {
     private final IUserInputReader input = new UserTerminalInputReader();
@@ -25,18 +27,21 @@ public class RegisterUserCommand {
             throw new RuntimeException(e);
         }
 
-        List<User> users;
+        Optional<List<User>> optUsers;
         List<String> existingUsernames = new ArrayList<>();
 
         try {
-            users = repository.findAllUsers();
+            optUsers = repository.findAllUsers();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("There was an error loading users from database.");
+            return;
         }
 
-        for (User user : users) {
-            existingUsernames.add(user.getUsername());
-        }
+        existingUsernames = optUsers
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(User::getUsername)
+                .toList();
 
         System.out.println("Enter the username you wish to use.");
         String username = "";

@@ -2,13 +2,13 @@ package examinationsprojekt.repositories;
 
 import examinationsprojekt.models.User;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public class UserDatabaseRepository implements IUserRepository{
+public class UserDatabaseRepository implements IUserRepository {
     // TODO: switch to returning Optional<User> where applicable if there is time
     private Connection connection;
 
@@ -37,7 +37,7 @@ public class UserDatabaseRepository implements IUserRepository{
         }
     }
 
-    public User findSingleUser(String username) throws SQLException {
+    public Optional<User> findSingleUser(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -46,18 +46,18 @@ public class UserDatabaseRepository implements IUserRepository{
             ResultSet resultSet = statement.executeQuery();
 
             if (!resultSet.next()) {
-                return null;
+                return Optional.empty();
             }
 
-            return new User(
+            return Optional.of(new User(
                     resultSet.getObject("id", UUID.class),
                     resultSet.getString("username"),
                     resultSet.getString("password_hash")
-            );
+            ));
         }
     }
 
-    public List<User> findAllUsers() throws Exception {
+    public Optional<List<User>> findAllUsers() throws Exception {
         List<User> users = new ArrayList<>();
 
         String sql = "SELECT * FROM users";
@@ -74,15 +74,6 @@ public class UserDatabaseRepository implements IUserRepository{
             }
         }
 
-        return users;
-    }
-
-    public boolean update(User updatedUser) throws IOException {
-        // cannot update user
-        return false;
-    }
-
-    public void delete(User deletedUser) throws IOException {
-        // cannot delete user
+        return Optional.of(users);
     }
 }

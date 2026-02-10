@@ -10,6 +10,9 @@ import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.SQLException;
+import java.util.Optional;
+
 public class LoginUserCommand {
     private final IUserInputReader input = new UserTerminalInputReader();
 
@@ -28,10 +31,11 @@ public class LoginUserCommand {
 
         System.out.println("Enter your username and password: ");
 
-        User user = null;
-        String usernameInput;
-        String passwordInput;
         while (true) {
+            Optional<User> optUser = Optional.empty();
+            String usernameInput;
+            String passwordInput;
+
             System.out.print("Username: ");
             usernameInput = input.stringInput();
 
@@ -39,15 +43,18 @@ public class LoginUserCommand {
             passwordInput = input.stringInput();
 
             try {
-                user = repository.findSingleUser(usernameInput);
-            } catch (Exception e) {
-                System.out.println("No such user or password.");
-            }
-
-            if (user == null) {
+                optUser = repository.findSingleUser(usernameInput);
+            } catch (SQLException e) {
                 System.out.println("No such user or password.");
                 continue;
             }
+
+            if (optUser.isEmpty()) {
+                System.out.println("No such user or password.");
+                continue;
+            }
+
+            User user = optUser.get();
 
             if (!BCrypt.checkpw(passwordInput, user.getPasswordHash())) {
                 System.out.println("No such user or password.");

@@ -2,16 +2,14 @@ package examinationsprojekt.repositories;
 
 import examinationsprojekt.models.User;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface IUserRepository {
     void save(User createdUser) throws Exception;
 
-    User findSingleUser(String username) throws Exception;
+    Optional<User> findSingleUser(String username) throws SQLException;
 
-    List<User> findAllUsers() throws Exception;
-
-    boolean update(User updatedUser) throws Exception;
-
-    void delete(User deletedUser) throws Exception;
+    Optional<List<User>> findAllUsers() throws Exception;
 }
