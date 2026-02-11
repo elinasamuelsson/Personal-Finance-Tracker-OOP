@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 public class ViewTransactionsCommand implements ICommand {
     private final int index = 5;
@@ -43,13 +40,16 @@ public class ViewTransactionsCommand implements ICommand {
             throw new RuntimeException("Could not connect to database.", e);
         }
 
-        List<Transaction> transactions;
+        Optional<List<Transaction>> optTransactions;
 
         try {
-            transactions = repository.findAllAccountTransactions(CurrentStateManager.getCurrentAccount().getId());
+            optTransactions = repository
+                    .findAllAccountTransactions(CurrentStateManager.getCurrentAccount().getId());
         } catch (Exception e) {
             throw new RuntimeException("Could not connect to database.", e);
         }
+
+        List<Transaction> transactions = optTransactions.orElse(new ArrayList<>());
 
         if (option.equals(ViewOptions.YEARLY)) {
             viewYearly(transactions);

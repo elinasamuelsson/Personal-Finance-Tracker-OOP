@@ -7,6 +7,7 @@ import examinationsprojekt.repositories.TransactionDatabaseRepository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ViewLatestCommand implements ICommand {
     private final int index = 9;
@@ -28,12 +29,14 @@ public class ViewLatestCommand implements ICommand {
             throw new RuntimeException("Could not connect to database.", e);
         }
 
-        HashMap<String, Transaction> latestTransactions;
+        Optional<HashMap<String, Transaction>> optLatestTransactions;
         try {
-            latestTransactions = repository.findLatestTransactionForEachUserAccount(CurrentStateManager.getCurrentUser().getId());
+            optLatestTransactions = repository.findLatestTransactionForEachUserAccount(CurrentStateManager.getCurrentUser().getId());
         } catch (Exception e) {
             throw new RuntimeException("Could not find latest transactions.", e);
         }
+
+        HashMap<String, Transaction> latestTransactions = optLatestTransactions.orElse(new HashMap<>());
 
         for (Map.Entry<String, Transaction> entry : latestTransactions.entrySet()) {
             String accountName = entry.getKey();

@@ -4,10 +4,7 @@ import examinationsprojekt.models.Transaction;
 import examinationsprojekt.models.TransactionTypes;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TransactionDatabaseRepository implements ITransactionRepository {
     Connection connection;
@@ -47,11 +44,7 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
         }
     }
 
-    public Transaction findSingleTransaction(UUID transactionId) throws Exception {
-        return null;
-    }
-
-    public List<Transaction> findAllAccountTransactions(UUID accountId) throws Exception {
+    public Optional<List<Transaction>> findAllAccountTransactions(UUID accountId) throws Exception {
         List<Transaction> transactions = new ArrayList<>();
 
         String sql = "SELECT * FROM transactions WHERE account_id = ?";
@@ -73,21 +66,21 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
                 transactions.add(transaction);
             }
         }
-        return transactions;
+        return Optional.of(transactions);
     }
 
-    public List<Transaction> searchTransactions(String searchPhrase) throws Exception {
+    public Optional<List<Transaction>> searchTransactions(String searchPhrase) throws Exception {
         List<Transaction> searchResults = new ArrayList<>();
 
         String sql = "SELECT * FROM transactions " +
                 "WHERE id::text ILIKE ? OR description ILIKE ? OR transaction_type ILIKE ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            String searchpattern = "%" + searchPhrase + "%";
+            String searchPattern = "%" + searchPhrase + "%";
 
-            statement.setString(1, searchpattern);
-            statement.setString(2, searchpattern);
-            statement.setString(3, searchpattern);
+            statement.setString(1, searchPattern);
+            statement.setString(2, searchPattern);
+            statement.setString(3, searchPattern);
 
             ResultSet resultSet = statement.executeQuery();
 
@@ -103,10 +96,10 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
                 searchResults.add(transaction);
             }
         }
-        return searchResults;
+        return Optional.of(searchResults);
     }
 
-    public HashMap<String, Transaction> findLatestTransactionForEachUserAccount(UUID userId) throws Exception {
+    public Optional<HashMap<String, Transaction>> findLatestTransactionForEachUserAccount(UUID userId) throws Exception {
         HashMap<String, Transaction> transactions = new HashMap<>();
         String sql = "SELECT a.account_name, t.id, t.amount, t.time, t.transaction_type, t.description, t.isearning " +
                 "FROM accounts a INNER JOIN transactions t ON a.id=t.account_id AND t.time = (SELECT MAX(transactions.time) " +
@@ -128,7 +121,7 @@ public class TransactionDatabaseRepository implements ITransactionRepository {
             }
         }
 
-        return transactions;
+        return Optional.of(transactions);
     }
 
 

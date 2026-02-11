@@ -7,13 +7,16 @@ import examinationsprojekt.repositories.TransactionDatabaseRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SearchTransactionCommand implements ICommand {
     private final int index = 7;
     private final String description = "Search transactions";
 
-    public SearchTransactionCommand() {}
+    public SearchTransactionCommand() {
+    }
 
     IUserInputReader input = new UserTerminalInputReader();
 
@@ -35,17 +38,19 @@ public class SearchTransactionCommand implements ICommand {
             return;
         }
 
-        List<Transaction> searchResults;
+        Optional<List<Transaction>> optSearchResults;
         String userInput = "";
         while (true) {
             System.out.println("Enter the phrase you wish to search for.");
             userInput = input.stringInput().toLowerCase();
 
             try {
-                searchResults = repository.searchTransactions(userInput);
+                optSearchResults = repository.searchTransactions(userInput);
             } catch (Exception e) {
                 throw new RuntimeException("Could not connect to database.", e);
             }
+
+            List<Transaction> searchResults = optSearchResults.orElse(new ArrayList<>());
 
             printSearchResults(searchResults);
             searchResults.clear();
