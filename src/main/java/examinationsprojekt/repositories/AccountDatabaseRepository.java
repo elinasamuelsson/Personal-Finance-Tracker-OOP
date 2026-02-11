@@ -5,6 +5,7 @@ import examinationsprojekt.models.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AccountDatabaseRepository implements IAccountRepository {
@@ -42,7 +43,7 @@ public class AccountDatabaseRepository implements IAccountRepository {
     }
 
 
-    public Account findSingleAccount(String accountName) throws Exception {
+    public Optional<Account> findSingleAccount(String accountName) throws Exception {
         Account account = null;
 
         String sql = "SELECT * FROM accounts WHERE account_name = ?";
@@ -75,10 +76,10 @@ public class AccountDatabaseRepository implements IAccountRepository {
                 );
             }
         }
-        return account;
+        return Optional.of(account);
     }
 
-    public List<Account> findAllUserAccounts() throws Exception {
+    public Optional<List<Account>> findAllUserAccounts() throws Exception {
             List<Account> accounts = new ArrayList<>();
 
             String sql = "SELECT * FROM accounts";
@@ -108,7 +109,7 @@ public class AccountDatabaseRepository implements IAccountRepository {
                 }
             }
         }
-        return accounts;
+        return Optional.of(accounts);
     }
 
     public boolean updateAccountBalance(UUID id, double amount) throws Exception {

@@ -7,7 +7,9 @@ import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SelectAccountCommand implements ICommand {
     private final int index = 2;
@@ -33,13 +35,15 @@ public class SelectAccountCommand implements ICommand {
         System.out.println("Which of the following accounts do you want to use?");
         System.out.println();
 
-        List<Account> accounts;
+        Optional<List<Account>> optAccounts;
 
         try {
-        accounts = repository.findAllUserAccounts();
+        optAccounts = repository.findAllUserAccounts();
         } catch (Exception e) {
             throw new RuntimeException("Could not find accounts in the database.", e);
         }
+
+        List<Account> accounts = optAccounts.orElse(new ArrayList<>());
 
         if (accounts.isEmpty()) {
             System.out.println("No accounts found.");

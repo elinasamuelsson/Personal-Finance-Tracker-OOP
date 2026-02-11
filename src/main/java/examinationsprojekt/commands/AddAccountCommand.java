@@ -7,8 +7,10 @@ import examinationsprojekt.repositories.IAccountRepository;
 import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Optional;
 
 public class AddAccountCommand implements ICommand {
     private final int index = 1;
@@ -21,15 +23,15 @@ public class AddAccountCommand implements ICommand {
 
     public void run() {
         IAccountRepository repository;
-                try {
-                repository = new AccountDatabaseRepository(
-                System.getenv("DB_URL"),
-                System.getenv("DB_USER"),
-                System.getenv("DB_PASS")
-        );
-                } catch (Exception e) {
-                    throw new RuntimeException("Could not connect to database.", e);
-                }
+        try {
+            repository = new AccountDatabaseRepository(
+                    System.getenv("DB_URL"),
+                    System.getenv("DB_USER"),
+                    System.getenv("DB_PASS")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
 
         Account account = null;
 
@@ -44,12 +46,14 @@ public class AddAccountCommand implements ICommand {
             account = new SavingsAccount(name, type, interest);
         }
 
-        List<Account> userAccounts;
-                try {
-                    userAccounts = repository.findAllUserAccounts();
-                } catch (Exception e) {
-                    throw new RuntimeException("Could not connect to database.", e);
-                }
+        Optional<List<Account>> optUserAccounts;
+        try {
+            optUserAccounts = repository.findAllUserAccounts();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not connect to database.", e);
+        }
+
+        List<Account> userAccounts = optUserAccounts.orElse(new ArrayList<>());
 
         if (!userAccounts.isEmpty()) {
             for (Account existingAccount : userAccounts) {

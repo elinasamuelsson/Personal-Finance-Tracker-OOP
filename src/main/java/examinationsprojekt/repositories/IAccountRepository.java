@@ -3,14 +3,15 @@ package examinationsprojekt.repositories;
 import examinationsprojekt.models.Account;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface IAccountRepository {
     void save(Account createdAccount, UUID userId) throws Exception;
 
-    Account findSingleAccount(String accountName) throws Exception;
+    Optional<Account> findSingleAccount(String accountName) throws Exception;
 
-    List<Account> findAllUserAccounts() throws Exception;
+    Optional<List<Account>> findAllUserAccounts() throws Exception;
 
     boolean updateAccountBalance(UUID id, double amount) throws Exception;
 

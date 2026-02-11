@@ -8,7 +8,9 @@ import examinationsprojekt.utils.IUserInputReader;
 import examinationsprojekt.utils.UserTerminalInputReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DeleteAccountCommand implements ICommand {
     private final int index = 3;
@@ -36,13 +38,15 @@ public class DeleteAccountCommand implements ICommand {
         System.out.println();
 
         Account accountToRemove = null;
-        List<Account> userAccounts;
+        Optional<List<Account>> optUserAccounts;
 
         try {
-            userAccounts = repository.findAllUserAccounts();
+            optUserAccounts = repository.findAllUserAccounts();
         } catch (Exception e) {
             throw new RuntimeException("Could not find accounts in the database.", e);
         }
+
+        List<Account> userAccounts = optUserAccounts.orElse(new ArrayList<>());
 
         if (userAccounts.isEmpty()) {
             System.out.println("No accounts found.");

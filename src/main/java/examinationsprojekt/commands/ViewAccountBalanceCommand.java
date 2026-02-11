@@ -5,6 +5,8 @@ import examinationsprojekt.models.Account;
 import examinationsprojekt.repositories.AccountDatabaseRepository;
 import examinationsprojekt.repositories.IAccountRepository;
 
+import java.util.Optional;
+
 public class ViewAccountBalanceCommand implements ICommand {
     private final int index = 8;
     private final String description = "View account balance";
@@ -30,15 +32,17 @@ public class ViewAccountBalanceCommand implements ICommand {
             return;
         }
 
-        Account account;
+        Optional<Account> optAccount;
 
         try {
-            account = repository.findSingleAccount(
+            optAccount = repository.findSingleAccount(
                     CurrentStateManager.getCurrentAccount().getName()
             );
         } catch (Exception e) {
             throw new RuntimeException("Could not connect to database.", e);
         }
+
+        Account account = optAccount.get();
 
         System.out.println("Your current account balance is " + account.getBalance());
     }
